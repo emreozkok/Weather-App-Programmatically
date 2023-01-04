@@ -13,8 +13,8 @@ protocol WeatherManagerDelegate{
     func didFailWithError(error: Error)
 }
 struct WeatherManager{
-    let API_KEY = "TYPE YOUR OWN APIKEY"
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=API_KEY&units=metric"
+    
+    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=\(SecretKey.apiKey)&units=metric"
     
     var delegate: WeatherManagerDelegate?
     
