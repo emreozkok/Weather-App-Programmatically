@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class WeatherViewController: UIViewController {
     
@@ -23,20 +24,29 @@ class WeatherViewController: UIViewController {
     var cityLbl = UILabel()
     
     var weatherManager = WeatherManager()
+    let locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         weatherManager.delegate = self
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
         style()
         layout()
         searchButton.addTarget(self, action: #selector(makeSearch), for: .touchUpInside)
+        locationButton.addTarget(self, action: #selector(makeLocSearch), for: .touchUpInside)
         
     }
 }
 
 //MARK: - UITextFieldDelegate
 extension WeatherViewController: UITextFieldDelegate{
+    @objc func makeLocSearch(){
+        locationManager.requestLocation()
+    }
+    
     @objc func makeSearch(){
         searchTextField.endEditing(true)
         print(searchTextField.text!)
@@ -177,5 +187,22 @@ extension WeatherViewController{
             conditionImage.heightAnchor.constraint(equalToConstant: 120),
             
         ])
+    }
+}
+
+//MARK: - CLLocationManagerDelegate
+
+extension WeatherViewController: CLLocationManagerDelegate{
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last{
+            locationManager.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            weatherManager.fethWeather(latitude: lat, longitude: lon)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
     }
 }
